@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Word Converter - 在线免费转换</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📄 PDF to Word</h1>
+            <p class="subtitle">简单、快速、免费的在线转换工具</p>
+        </header>
+
+        <main class="main-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <h2>拖拽或点击上传PDF</h2>
+                <p class="upload-hint">支持最大50MB文件</p>
+                <input type="file" id="fileInput" accept=".pdf" hidden>
+                <button class="btn-upload" id="btnUpload">选择文件</button>
+            </div>
+
+            <div class="file-info" id="fileInfo" style="display: none;">
+                <div class="file-details">
+                    <span class="file-icon">📄</span>
+                    <div class="file-meta">
+                        <div class="file-name" id="fileName"></div>
+                        <div class="file-size" id="fileSize"></div>
+                    </div>
+                    <button class="btn-remove" id="btnRemove">✕</button>
+                </div>
+            </div>
+
+            <div class="quota-info" id="quotaInfo">
+                <div class="quota-card">
+                    <span class="quota-icon">🎁</span>
+                    <div class="quota-text">
+                        <strong>免费用户</strong>
+                        <span id="quotaRemaining">2 次/天剩余</span>
+                    </div>
+                </div>
+                <button class="btn-upgrade" id="btnUpgrade">
+                    ⭐ 升级会员 - $4.99/月
+                </button>
+            </div>
+
+            <div class="action-area" id="actionArea" style="display: none;">
+                <button class="btn-convert" id="btnConvert">
+                    <span class="btn-text">开始转换</span>
+                    <span class="btn-loader" style="display: none;">转换中...</span>
+                </button>
+            </div>
+
+            <div class="result-area" id="resultArea" style="display: none;">
+                <div class="result-success">
+                    <span class="success-icon">✅</span>
+                    <h3>转换成功！</h3>
+                    <button class="btn-download" id="btnDownload">
+                        📥 下载 Word 文档
+                    </button>
+                </div>
+            </div>
+
+            <div class="paypal-area" id="paypalArea" style="display: none;">
+                <div class="paypal-card">
+                    <h3>升级会员</h3>
+                    <p class="price">$4.99 <span class="period">/月</span></p>
+                    <ul class="features">
+                        <li>✅ 无限转换次数</li>
+                        <li>✅ 最大50MB文件</li>
+                        <li>✅ 高质量转换</li>
+                        <li>✅ 优先客服支持</li>
+                    </ul>
+                    <div id="paypal-button-container"></div>
+                    <button class="btn-cancel" id="btnCancel">返回</button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>© 2026 PDF to Word Converter. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
+    <script src="script.js"></script>
+</body>
+</html>
