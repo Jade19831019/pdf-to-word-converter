@@ -189,6 +189,8 @@ class PDFToWordConverter {
         const formData = new FormData();
         formData.append('File', this.selectedFile);
         
+        console.log('开始转换PDF...');
+        
         const response = await fetch(`https://v2.convertapi.com/convert/pdf/to/docx?Secret=${this.convertApiKey}`, {
             method: 'POST',
             body: formData
@@ -196,13 +198,16 @@ class PDFToWordConverter {
         
         const result = await response.json();
         
+        console.log('ConvertAPI响应:', result);
+        
         if (result.Files && result.Files.length > 0) {
             return {
                 downloadUrl: result.Files[0].Url,
                 fileName: result.Files[0].FileName
             };
         } else {
-            throw new Error('转换失败');
+            console.error('ConvertAPI错误:', result);
+            throw new Error(result.Message || '转换失败');
         }
     }
 
@@ -210,8 +215,30 @@ class PDFToWordConverter {
         this.actionArea.style.display = 'none';
         this.resultArea.style.display = 'block';
         
-        this.btnDownload.onclick = () => {
-            window.open(result.downloadUrl, '_blank');
+        console.log('显示下载结果:', result);
+        
+        this.btnDownload.onclick = async () => {
+            try {
+                console.log('开始下载文件:', result.downloadUrl);
+                
+                // 方式1：直接打开新窗口
+                window.open(result.downloadUrl, '_blank');
+                
+                // 方式2：如果方式1不行，创建隐藏的a标签下载
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = result.downloadUrl;
+                    link.download = result.fileName || 'converted.docx';
+                    link.target = '_blank';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }, 500);
+                
+            } catch (error) {
+                console.error('下载失败:', error);
+                alert('下载失败，请尝试右键点击链接另存为！');
+            }
         };
     }
 
