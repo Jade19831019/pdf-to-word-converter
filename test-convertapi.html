@@ -1,78 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ConvertAPI 测试</title>
+    <title>ConvertAPI 测试 - 官方版</title>
     <meta charset="utf-8">
 </head>
 <body>
-    <h1>ConvertAPI 测试页面</h1>
+    <h1>PDF to Word 测试 - ConvertAPI官方版</h1>
     
     <input type="file" id="fileInput" accept=".pdf">
-    <button onclick="testConvert()">测试转换</button>
+    <button onclick="testConvert()">开始转换</button>
     
     <div id="result"></div>
     
+    <!-- 引入ConvertAPI官方库 -->
+    <script src="https://cdn.convertapi.com/js/convertapi-2.0.js"></script>
+    
     <script>
-        const convertApiKey = 'Xy4IX8NQtXKUAyjezmZ7G1o4rvTH0R8A';
+        const convertApiSecret = 'Xy4IX8NQtXKUAyjezmZ7G1o4rvTH0R8A';
+        
+        // 初始化ConvertAPI
+        const convertApi = new ConvertApi(convertApiSecret);
         
         async function testConvert() {
-            const file = document.getElementById('fileInput').files[0];
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
             if (!file) {
                 alert('请先选择PDF文件');
                 return;
             }
             
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<p>正在转换...</p>';
+            resultDiv.innerHTML = '<p>⏳ 正在转换中，请稍候...</p>';
             
             try {
-                const formData = new FormData();
-                formData.append('File', file);
+                console.log('开始转换文件:', file.name);
                 
-                console.log('发送请求到ConvertAPI...');
-                
-                // 添加更详细的转换参数
-                const url = `https://v2.convertapi.com/convert/pdf/to/docx?Secret=${convertApiKey}&StoreFile=true`;
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData
+                // 使用ConvertAPI官方库转换
+                const result = await convertApi.convert('pdf', 'docx', {
+                    File: file
                 });
                 
-                const result = await response.json();
+                console.log('转换成功！结果:', result);
                 
-                console.log('ConvertAPI完整响应:', result);
+                // 获取文件信息
+                const fileData = result.files[0];
+                const downloadUrl = fileData.url;
+                const fileName = fileData.fileName;
+                const fileSize = fileData.fileSize || '未知';
+                
                 resultDiv.innerHTML = `
-                    <h3>响应结果:</h3>
-                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                    <h3 style="color: green;">✅ 转换成功！</h3>
+                    <p><strong>文件名:</strong> ${fileName}</p>
+                    <p><strong>文件大小:</strong> ${fileSize} 字节</p>
+                    <p><strong>下载链接:</strong></p>
+                    <p style="background: #f0f0f0; padding: 10px; word-break: break-all;">
+                        <a href="${downloadUrl}" target="_blank">${downloadUrl}</a>
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <h4>下载方式：</h4>
+                        <p style="margin: 10px 0;">
+                            <a href="${downloadUrl}" target="_blank" 
+                               style="padding: 12px 24px; background: #007bff; color: white; 
+                                      text-decoration: none; border-radius: 6px; font-size: 16px;
+                                      display: inline-block;">
+                               🚀 方式1：新窗口打开
+                            </a>
+                        </p>
+                        <p style="margin: 10px 0;">
+                            <a href="${downloadUrl}" download="${fileName}"
+                               style="padding: 12px 24px; background: #28a745; color: white; 
+                                      text-decoration: none; border-radius: 6px; font-size: 16px;
+                                      display: inline-block;">
+                               📥 方式2：直接下载
+                            </a>
+                        </p>
+                    </div>
+                    <p style="margin-top: 20px; color: #666; font-size: 14px;">
+                        💡 提示：如果文件无法打开，请尝试"右键 → 链接另存为..."
+                    </p>
                 `;
                 
-                if (result.Files && result.Files.length > 0) {
-                    const downloadUrl = result.Files[0].Url;
-                    const fileName = result.Files[0].FileName;
-                    const fileSize = result.Files[0].FileSize || '未知';
-                    
-                    resultDiv.innerHTML += `
-                        <p><strong>下载URL:</strong> <a href="${downloadUrl}" target="_blank">${downloadUrl}</a></p>
-                        <p><strong>文件名:</strong> ${fileName}</p>
-                        <p><strong>文件大小:</strong> ${fileSize} 字节</p>
-                        <p style="margin-top: 15px;">
-                            <strong>下载方式1:</strong> 
-                            <a href="${downloadUrl}" target="_blank" style="padding:8px 15px;background:#0070f3;color:white;text-decoration:none;border-radius:5px;">新窗口打开</a>
-                        </p>
-                        <p style="margin-top: 10px;">
-                            <strong>下载方式2:</strong> 
-                            <a href="${downloadUrl}" download="${fileName}" style="padding:8px 15px;background:#28a745;color:white;text-decoration:none;border-radius:5px;">直接下载</a>
-                        </p>
-                        <p style="margin-top: 15px; color: #666; font-size: 12px;">
-                            如果无法打开，请尝试：右键链接 → 另存为...
-                        </p>
-                    `;
-                }
-                
             } catch (error) {
-                console.error('错误:', error);
-                resultDiv.innerHTML = `<p style="color:red;">错误: ${error.message}</p>`;
+                console.error('转换失败:', error);
+                resultDiv.innerHTML = `
+                    <h3 style="color: red;">❌ 转换失败</h3>
+                    <p><strong>错误信息:</strong></p>
+                    <pre style="background: #ffe6e6; padding: 15px;">${error.message || JSON.stringify(error, null, 2)}</pre>
+                `;
             }
         }
     </script>
