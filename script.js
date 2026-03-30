@@ -217,27 +217,51 @@ class PDFToWordConverter {
         
         console.log('显示下载结果:', result);
         
+        // 直接显示下载链接让用户点击
+        const resultArea = document.getElementById('resultArea');
+        const successDiv = resultArea.querySelector('.result-success');
+        
+        // 添加直接下载链接
+        const linkHtml = document.createElement('div');
+        linkHtml.style.marginTop = '20px';
+        linkHtml.innerHTML = `
+            <p style="margin-bottom: 10px;">如果下载按钮无法下载，请复制下面的链接到浏览器地址栏打开：</p>
+            <p style="background: #f3f4f6; padding: 10px; border-radius: 8px; word-break: break-all; font-size: 12px;">
+                <a href="${result.downloadUrl}" target="_blank" style="color: #2563eb; text-decoration: underline;">
+                    ${result.downloadUrl}
+                </a>
+            </p>
+        `;
+        successDiv.appendChild(linkHtml);
+        
         this.btnDownload.onclick = async () => {
             try {
                 console.log('开始下载文件:', result.downloadUrl);
                 
-                // 方式1：直接打开新窗口
-                window.open(result.downloadUrl, '_blank');
+                // 方式1：用fetch下载blob
+                const response = await fetch(result.downloadUrl);
+                const blob = await response.blob();
                 
-                // 方式2：如果方式1不行，创建隐藏的a标签下载
-                setTimeout(() => {
-                    const link = document.createElement('a');
-                    link.href = result.downloadUrl;
-                    link.download = result.fileName || 'converted.docx';
-                    link.target = '_blank';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }, 500);
+                // 创建下载链接
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = result.fileName || 'converted.docx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
                 
             } catch (error) {
                 console.error('下载失败:', error);
-                alert('下载失败，请尝试右键点击链接另存为！');
+                
+                // 如果方式1失败，尝试方式2：直接打开
+                try {
+                    window.open(result.downloadUrl, '_blank');
+                } catch (e2) {
+                    console.error('方式2也失败:', e2);
+                    alert('下载失败！请复制页面上的链接到浏览器地址栏直接打开！');
+                }
             }
         };
     }
