@@ -4,7 +4,7 @@ class PDFToWordConverter {
         this.selectedFile = null;
         this.isMember = false;
         this.dailyUsage = this.getDailyUsage();
-        this.convertApiKey = 'YOUR_CONVERT_API_KEY'; // 需要替换
+        this.convertApiKey = 'Xy4IX8NQtXKUAyjezmZ7G1o4rvTH0R8A';
         
         this.init();
     }
@@ -186,17 +186,24 @@ class PDFToWordConverter {
     }
 
     async convertWithConvertAPI() {
-        // 这里需要配置ConvertAPI
-        // 暂时用模拟，实际需要替换为真实API调用
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // 模拟返回下载URL
-                resolve({
-                    downloadUrl: '#',
-                    fileName: this.selectedFile.name.replace('.pdf', '.docx')
-                });
-            }, 2000);
+        const formData = new FormData();
+        formData.append('File', this.selectedFile);
+        
+        const response = await fetch(`https://v2.convertapi.com/convert/pdf/to/docx?Secret=${this.convertApiKey}`, {
+            method: 'POST',
+            body: formData
         });
+        
+        const result = await response.json();
+        
+        if (result.Files && result.Files.length > 0) {
+            return {
+                downloadUrl: result.Files[0].Url,
+                fileName: result.Files[0].FileName
+            };
+        } else {
+            throw new Error('转换失败');
+        }
     }
 
     showResult(result) {
@@ -204,8 +211,7 @@ class PDFToWordConverter {
         this.resultArea.style.display = 'block';
         
         this.btnDownload.onclick = () => {
-            // 实际项目中这里会下载真实文件
-            alert('下载功能需要配置真实的ConvertAPI！');
+            window.open(result.downloadUrl, '_blank');
         };
     }
 

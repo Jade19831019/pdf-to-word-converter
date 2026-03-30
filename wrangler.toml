@@ -11,6 +11,6 @@ id = "your-kv-namespace-id"  # 需要替换
 
 # 环境变量
 [vars]
-CONVERT_API_KEY = "your-convert-api-key"  # 需要替换
+CONVERT_API_KEY = "Xy4IX8NQtXKUAyjezmZ7G1o4rvTH0R8A"
 PAYPAL_CLIENT_ID = "your-paypal-client-id"  # 需要替换
 PAYPAL_CLIENT_SECRET = "your-paypal-client-secret"  # 需要替换
