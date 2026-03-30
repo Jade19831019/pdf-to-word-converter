@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF to Word - 简单直接测试</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>PDF to Word 测试 - 最简单直接版</h1>
+    
+    <input type="file" id="fileInput" accept=".pdf">
+    <button onclick="uploadPDF()">上传PDF</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        const convertApiKey = 'Xy4IX8NQtXKUAyjezmZ7G1o4rvTH0R8A';
+        
+        async function uploadPDF() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('请先选择PDF文件');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>上传中...</p>';
+            
+            try {
+                // 第一步：上传文件
+                const uploadForm = new FormData();
+                uploadForm.append('file', file);
+                
+                console.log('第一步：上传文件到ConvertAPI...');
+                
+                const uploadResponse = await fetch(`https://v2.convertapi.com/upload?Secret=${convertApiKey}`, {
+                    method: 'POST',
+                    body: uploadForm
+                });
+                
+                const uploadResult = await uploadResponse.json();
+                console.log('上传结果:', uploadResult);
+                
+                if (!uploadResult.FileId) {
+                    throw new Error('上传失败: ' + JSON.stringify(uploadResult));
+                }
+                
+                const fileId = uploadResult.FileId;
+                resultDiv.innerHTML = '<p>✅ 文件上传成功！开始转换...</p>';
+                
+                // 第二步：转换
+                console.log('第二步：开始转换...');
+                
+                const convertUrl = `https://v2.convertapi.com/convert/pdf/to/docx?Secret=${convertApiKey}&FileId=${fileId}`;
+                
+                const convertResponse = await fetch(convertUrl, {
+                    method: 'POST'
+                });
+                
+                const convertResult = await convertResponse.json();
+                console.log('转换结果:', convertResult);
+                
+                if (!convertResult.Files || convertResult.Files.length === 0) {
+                    throw new Error('转换失败: ' + JSON.stringify(convertResult));
+                }
+                
+                const downloadUrl = convertResult.Files[0].Url;
+                const fileName = convertResult.Files[0].FileName;
+                const fileSize = convertResult.Files[0].FileSize;
+                
+                resultDiv.innerHTML = `
+                    <h2>✅ 转换成功！</h2>
+                    <p><strong>文件名:</strong> ${fileName}</p>
+                    <p><strong>文件大小:</strong> ${fileSize} 字节</p>
+                    <p><strong>下载链接:</strong></p>
+                    <p style="background:#f0f0f0;padding:10px;word-break:break-all;">
+                        <a href="${downloadUrl}" target="_blank">${downloadUrl}</a>
+                    </p>
+                    <p style="margin-top:20px;">
+                        <a href="${downloadUrl}" target="_blank" 
+                           style="padding:15px 30px;background:#0070f3;color:white;text-decoration:none;border-radius:8px;font-size:18px;">
+                           🚀 新窗口打开并下载
+                        </a>
+                    </p>
+                    <p style="margin-top:10px;">
+                        <a href="${downloadUrl}" download="${fileName}"
+                           style="padding:15px 30px;background:#28a745;color:white;text-decoration:none;border-radius:8px;font-size:18px;">
+                           📥 直接下载文件
+                        </a>
+                    </p>
+                `;
+                
+            } catch (error) {
+                console.error('错误:', error);
+                resultDiv.innerHTML = `
+                    <h2 style="color:red;">❌ 出错了</h2>
+                    <pre style="background:#ffe6e6;padding:15px;">${error.message}</pre>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
