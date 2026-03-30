@@ -31,7 +31,10 @@
                 
                 console.log('发送请求到ConvertAPI...');
                 
-                const response = await fetch(`https://v2.convertapi.com/convert/pdf/to/docx?Secret=${convertApiKey}`, {
+                // 添加更详细的转换参数
+                const url = `https://v2.convertapi.com/convert/pdf/to/docx?Secret=${convertApiKey}&StoreFile=true`;
+                
+                const response = await fetch(url, {
                     method: 'POST',
                     body: formData
                 });
@@ -47,10 +50,23 @@
                 if (result.Files && result.Files.length > 0) {
                     const downloadUrl = result.Files[0].Url;
                     const fileName = result.Files[0].FileName;
+                    const fileSize = result.Files[0].FileSize || '未知';
+                    
                     resultDiv.innerHTML += `
                         <p><strong>下载URL:</strong> <a href="${downloadUrl}" target="_blank">${downloadUrl}</a></p>
                         <p><strong>文件名:</strong> ${fileName}</p>
-                        <a href="${downloadUrl}" download="${fileName}" style="display:inline-block;padding:10px 20px;background:#0070f3;color:white;text-decoration:none;border-radius:5px;margin-top:10px;">点击下载</a>
+                        <p><strong>文件大小:</strong> ${fileSize} 字节</p>
+                        <p style="margin-top: 15px;">
+                            <strong>下载方式1:</strong> 
+                            <a href="${downloadUrl}" target="_blank" style="padding:8px 15px;background:#0070f3;color:white;text-decoration:none;border-radius:5px;">新窗口打开</a>
+                        </p>
+                        <p style="margin-top: 10px;">
+                            <strong>下载方式2:</strong> 
+                            <a href="${downloadUrl}" download="${fileName}" style="padding:8px 15px;background:#28a745;color:white;text-decoration:none;border-radius:5px;">直接下载</a>
+                        </p>
+                        <p style="margin-top: 15px; color: #666; font-size: 12px;">
+                            如果无法打开，请尝试：右键链接 → 另存为...
+                        </p>
                     `;
                 }
                 
