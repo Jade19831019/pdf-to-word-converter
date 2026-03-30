@@ -2,6 +2,7 @@
 name = "pdf-to-word-converter"
 main = "_worker.js"
 compatibility_date = "2024-01-01"
+account_id = "96e986a523a0b7b83584132878d5aae3"
 
 # Cloudflare KV 命名空间
 [[kv_namespaces]]
