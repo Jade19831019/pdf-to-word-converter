@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ConvertAPI 测试</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>ConvertAPI 测试页面</h1>
+    
+    <input type="file" id="fileInput" accept=".pdf">
+    <button onclick="testConvert()">测试转换</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        const convertApiKey = 'Xy4IX8NQtXKUAyjezmZ7G1o4rvTH0R8A';
+        
+        async function testConvert() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) {
+                alert('请先选择PDF文件');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>正在转换...</p>';
+            
+            try {
+                const formData = new FormData();
+                formData.append('File', file);
+                
+                console.log('发送请求到ConvertAPI...');
+                
+                const response = await fetch(`https://v2.convertapi.com/convert/pdf/to/docx?Secret=${convertApiKey}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                console.log('ConvertAPI完整响应:', result);
+                resultDiv.innerHTML = `
+                    <h3>响应结果:</h3>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+                
+                if (result.Files && result.Files.length > 0) {
+                    const downloadUrl = result.Files[0].Url;
+                    const fileName = result.Files[0].FileName;
+                    resultDiv.innerHTML += `
+                        <p><strong>下载URL:</strong> <a href="${downloadUrl}" target="_blank">${downloadUrl}</a></p>
+                        <p><strong>文件名:</strong> ${fileName}</p>
+                        <a href="${downloadUrl}" download="${fileName}" style="display:inline-block;padding:10px 20px;background:#0070f3;color:white;text-decoration:none;border-radius:5px;margin-top:10px;">点击下载</a>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('错误:', error);
+                resultDiv.innerHTML = `<p style="color:red;">错误: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
