@@ -212,17 +212,22 @@ class PDFToWordConverter {
     }
 
     showResult(result) {
+        console.log('开始显示结果:', result);
+        
         this.actionArea.style.display = 'none';
         this.resultArea.style.display = 'block';
         
-        console.log('显示下载结果:', result);
-        
-        // 直接显示下载链接让用户点击
+        // 先清理之前的内容
         const resultArea = document.getElementById('resultArea');
         const successDiv = resultArea.querySelector('.result-success');
         
+        // 移除之前添加的额外内容（如果有）
+        const extraLinks = successDiv.querySelectorAll('.extra-download-info');
+        extraLinks.forEach(el => el.remove());
+        
         // 添加直接下载链接
         const linkHtml = document.createElement('div');
+        linkHtml.className = 'extra-download-info';
         linkHtml.style.marginTop = '20px';
         linkHtml.innerHTML = `
             <p style="margin-bottom: 10px;">如果下载按钮无法下载，请复制下面的链接到浏览器地址栏打开：</p>
@@ -234,36 +239,21 @@ class PDFToWordConverter {
         `;
         successDiv.appendChild(linkHtml);
         
+        // 设置下载按钮事件
         this.btnDownload.onclick = async () => {
             try {
                 console.log('开始下载文件:', result.downloadUrl);
                 
-                // 方式1：用fetch下载blob
-                const response = await fetch(result.downloadUrl);
-                const blob = await response.blob();
-                
-                // 创建下载链接
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = result.fileName || 'converted.docx';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(url);
+                // 方式1：直接打开新窗口下载（最简单）
+                window.open(result.downloadUrl, '_blank');
                 
             } catch (error) {
                 console.error('下载失败:', error);
-                
-                // 如果方式1失败，尝试方式2：直接打开
-                try {
-                    window.open(result.downloadUrl, '_blank');
-                } catch (e2) {
-                    console.error('方式2也失败:', e2);
-                    alert('下载失败！请复制页面上的链接到浏览器地址栏直接打开！');
-                }
+                alert('下载失败！请复制页面上的链接到浏览器地址栏直接打开！');
             }
         };
+        
+        console.log('结果显示完成');
     }
 
     showPayPal() {
