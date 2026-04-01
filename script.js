@@ -1,5 +1,5 @@
 
-// PDF to Word 前端逻辑 - Google OAuth 修复版
+// PDF to Word 前端逻辑 - ConvertAPI 响应修复版
 let converter = null;
 
 class PDFToWordConverter {
@@ -337,18 +337,45 @@ class PDFToWordConverter {
         
         const result = await response.json();
         
-        console.log('ConvertAPI 响应:', result);
+        console.log('ConvertAPI 完整响应:', JSON.stringify(result, null, 2));
+        
+        let downloadUrl = null;
+        let fileName = null;
         
         if (result.Files && result.Files.length > 0) {
-            return {
-                downloadUrl: result.Files[0].Url,
-                fileName: result.Files[0].FileName,
-                service: 'ConvertAPI'
-            };
-        } else {
-            console.error('ConvertAPI错误:', result);
-            throw new Error(result.Message || '转换失败');
+            const fileInfo = result.Files[0];
+            
+            console.log('FileInfo 对象:', JSON.stringify(fileInfo, null, 2));
+            
+            downloadUrl = fileInfo.Url || fileInfo.url || fileInfo.DownloadUrl || fileInfo.downloadUrl;
+            fileName = fileInfo.FileName || fileInfo.fileName || fileInfo.Filename || fileInfo.filename;
+            
+            if (!downloadUrl && fileInfo.Id) {
+                downloadUrl = `https://v2.convertapi.com/d/${fileInfo.Id}`;
+            }
+            
+            if (!downloadUrl && fileInfo.id) {
+                downloadUrl = `https://v2.convertapi.com/d/${fileInfo.id}`;
+            }
         }
+        
+        if (!downloadUrl) {
+            console.error('无法找到下载链接，完整响应:', result);
+            throw new Error('转换成功但无法获取下载链接，请查看控制台日志');
+        }
+        
+        if (!fileName) {
+            fileName = file.name.replace('.pdf', '.docx');
+        }
+        
+        console.log('提取到的下载链接:', downloadUrl);
+        console.log('提取到的文件名:', fileName);
+        
+        return {
+            downloadUrl: downloadUrl,
+            fileName: fileName,
+            service: 'ConvertAPI'
+        };
     }
 
     showResult(result) {
@@ -489,7 +516,6 @@ document.addEventListener('DOMContentLoaded', () => {
     converter = new PDFToWordConverter();
 });
 
-// 全局回调函数，供 Google SDK 调用
 window.handleGoogleLogin = function(response) {
     console.log('Google 登录全局回调触发:', response);
     if (converter) {
