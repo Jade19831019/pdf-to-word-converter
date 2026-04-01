@@ -1,5 +1,6 @@
 
-// PDF to Word 前端逻辑 - 最简单版本
+// PDF to Word 前端逻辑 - 最终完美版
+// 复制这个文件的全部内容到 GitHub 的 script.js
 let converter = null;
 
 window.handleGoogleLogin = function(response) {
@@ -17,7 +18,7 @@ class PDFToWordConverter {
         this.isMember = false;
         this.dailyUsage = this.getDailyUsage();
         this.user = this.getUser();
-        this.convertApiKey = 'secret_TlCaots3K4kAaqve';
+        this.convertApiKey = 'Xy4IX8NQtXKUAyjezmZ7G1o4rvTH0R8A';
         this.init();
     }
 
@@ -373,7 +374,7 @@ class PDFToWordConverter {
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        return parseFloat((bytes / Math.pow(k, i).toFixed(2)) + ' ' + sizes[i]);
     }
 }
 
