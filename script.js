@@ -1,5 +1,7 @@
 
-// PDF to Word 前端逻辑 - Google OAuth 版
+// PDF to Word 前端逻辑 - Google OAuth 修复版
+let converter = null;
+
 class PDFToWordConverter {
     constructor() {
         this.selectedFile = null;
@@ -73,9 +75,7 @@ class PDFToWordConverter {
     }
 
     initGoogleLogin() {
-        window.handleGoogleLogin = (response) => {
-            this.handleGoogleResponse(response);
-        };
+        console.log('Google 登录初始化完成');
     }
 
     handleGoogleResponse(response) {
@@ -481,10 +481,20 @@ class PDFToWordConverter {
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        return parseFloat((bytes / Math.pow(k, i).toFixed(2)) + ' ' + sizes[i];
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    new PDFToWordConverter();
+    converter = new PDFToWordConverter();
 });
+
+// 全局回调函数，供 Google SDK 调用
+window.handleGoogleLogin = function(response) {
+    console.log('Google 登录全局回调触发:', response);
+    if (converter) {
+        converter.handleGoogleResponse(response);
+    } else {
+        console.error('Converter 未初始化');
+    }
+};
