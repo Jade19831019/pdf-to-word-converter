@@ -275,7 +275,7 @@ class PDFToWordConverter {
             this.showResult(result);
         } catch (error) {
             console.error('所有转换服务都失败:', error);
-            alert('转换失败，请稍后重试！\n\n错误信息: ' + error.message);
+            alert('转换失败！\n\n详细错误信息:\n' + JSON.stringify(error, null, 2));
         } finally {
             this.btnConvert.disabled = false;
             this.btnConvert.querySelector('.btn-text').style.display = 'inline';
