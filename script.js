@@ -1,6 +1,16 @@
 
-// PDF to Word 前端逻辑 - ConvertAPI 响应修复版
+// PDF to Word 前端逻辑 - 最终修复版
 let converter = null;
+
+// 先定义全局回调函数，确保 Google SDK 能找到
+window.handleGoogleLogin = function(response) {
+    console.log('Google 登录全局回调触发:', response);
+    if (converter) {
+        converter.handleGoogleResponse(response);
+    } else {
+        console.error('Converter 未初始化');
+    }
+};
 
 class PDFToWordConverter {
     constructor() {
@@ -13,7 +23,7 @@ class PDFToWordConverter {
             {
                 id: 'convertapi',
                 name: 'ConvertAPI',
-                key: 'Xy4IX8NQtXKUAyjezmZ7G1o4rvTH0R8A',
+                key: 'secret_TlCaots3K4kAaqve',
                 enabled: true,
                 converter: this.convertWithConvertAPI.bind(this)
             }
@@ -515,12 +525,3 @@ class PDFToWordConverter {
 document.addEventListener('DOMContentLoaded', () => {
     converter = new PDFToWordConverter();
 });
-
-window.handleGoogleLogin = function(response) {
-    console.log('Google 登录全局回调触发:', response);
-    if (converter) {
-        converter.handleGoogleResponse(response);
-    } else {
-        console.error('Converter 未初始化');
-    }
-};
